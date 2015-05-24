@@ -1,6 +1,8 @@
 <?php
+
 class Calendar
 {
+
     private $time;
 
     private $output = "";
@@ -18,6 +20,8 @@ class Calendar
             "Sat" => "Saturday",
             "Sun" => "Sunday"
     );
+
+    private $errorList = array();
 
     public function __construct ()
     {
@@ -45,9 +49,9 @@ class Calendar
             if (date("N", $currentDayTimestamp) == 1) {
                 $newline = true;
             }
-            if (floor(($this->time - $currentDayTimestamp) / (3600*24)) == 0){
+            if (floor(($this->time - $currentDayTimestamp) / (3600 * 24)) == 0) {
                 // Current day is the real current day
-                $this->addTableCell("<b>". $dayOfMonthOutput ."<b>", $newline);
+                $this->addTableCell($dayOfMonthOutput, $newline);
             } elseif ($currectDay >= 0 and $currectDay < $daysMonth) {
                 // Just another day in current month
                 $this->addTableCell($dayOfMonthOutput, $newline);
@@ -65,7 +69,7 @@ class Calendar
 
     private function createTableHeader ()
     {
-        $this->output .= "<table style=\"text-align: center;\">\n";
+        $this->output .= "<table>\n";
         $this->output .= "\t<caption>" . date("F Y", $this->time) .
                  "</caption>\n";
         $this->output .= "\t<thead>\n";
@@ -103,6 +107,8 @@ class Calendar
     {
         if (count($weekdaysArray) == 7) {
             $this->weekdays = $weekdaysArray;
+        } else {
+            $this->errorList["Wrong size array"] = "Your specified weekday-array hasn't the size of seven items.";
         }
     }
 
@@ -113,16 +119,31 @@ class Calendar
 
     public function showOnlyDaysOfThisMonth ($boolean)
     {
-        if (is_bool($boolean)) {
-            $this->showOnlyDaysOfThisMonth = $boolean;
+        $this->showOnlyDaysOfThisMonth = $this->getBoolean($boolean, 
+                $this->showOnlyDaysOfThisMonth);
+    }
+
+    private function getBoolean ($booleanToCheck, $default)
+    {
+        if (is_bool($booleanToCheck)) {
+            return $booleanToCheck;
+        } elseif (strcasecmp($booleanToCheck, "true") == 0) {
+            return true;
+        } elseif (strcasecmp($booleanToCheck, "false") == 0) {
+            return false;
         } else {
-            if (is_string($boolean)) {
-                if (strcmp($boolean, "true") == 0) {
-                    $this->showOnlyDaysOfThisMonth = true;
-                } elseif (strcmp($boolean, "false") == 0) {
-                    $this->showOnlyDaysOfThisMonth = false;
-                }
-            }
+            $this->errorList["Parse error"] = "One of your parameters isn't a valid boolean.";
         }
+        
+        return $default;
+    }
+
+    public function getErrors ()
+    {
+        $error_output = "";
+        foreach ($this->errorList as $error) {
+            $error_output .= "<p>" . $error . "</p>";
+        }
+        return $error_output;
     }
 }
