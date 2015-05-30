@@ -3,3 +3,23 @@ This project let you implement a calendar in your website. This calendar is very
 
 #Licence
 This code is licensed under the terms of [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+#Simple integration
+First, you have to include the required files:
+```
+require_once 'calendar/calendar.php';
+```
+
+Then, you have to create an instance of the calender:
+```
+$calendar = new Calendar();
+```
+
+After that, you can generate the calendar:
+```
+$calendar->generateFullCalendar();
+```
+In the end, you can display the calendar:
+```
+echo $calendar->output();
+```
