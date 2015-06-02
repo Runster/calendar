@@ -129,6 +129,11 @@ class Calendar
 			$this->output .= "\t\t<tr>\n";
 		}
 		
+		if(array_key_exists("day_of_month", $this->styleClasses))
+		{
+			$input = "<div" . $this->checkForStyleClass("day_of_month") . ">". $input ."</div>";
+		}
+		
 		if ($class === null) {
 			$this->output .= "\t\t\t<td>" . $input . "</td>\n";
 		} else {
@@ -194,7 +199,7 @@ class Calendar
 		if (is_array($styleClasses)) {
 			$this->styleClasses = $styleClasses;
 		} else {
-			$this->errorList["Array error"] = "One of your parameters isn't an array";
+			$this->errorList["Array error"] = "One of your parameters isn't an array.";
 		}
 	}
 
@@ -216,7 +221,7 @@ class Calendar
 					}
 				}
 				if (! $found) {
-					$this->errorList["Startweekday not found"] = "The weekday you specified ist not in the weekdays-array.";
+					$this->errorList["Startweekday not found"] = "The weekday you specified is not in the weekdays-array.";
 				}
 			}
 		} else {
