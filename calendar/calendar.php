@@ -20,6 +20,8 @@ class Calendar
 	private $setStartWeekdayRequired = false;
 
 	private $startWeekday = "Saturday";
+	
+	private $dayFormat = 'j';
 
 	public function __construct ()
 	{
@@ -45,24 +47,17 @@ class Calendar
 					$newline = true;
 				}
 				if ($i < $daysFromLastMonth) {
-					if (! $this->showOnlyDaysOfThisMonth) {
-						$lastMonth = mktime(0, 0, 0, date("m", $this->time) - 1, 1, date("Y", $this->time));
-						$lastMonthDays = date("t", $lastMonth);
-						$this->addTableCell($lastMonthDays - $daysFromLastMonth + $i + 1, $newline, "last_month_days");
-					} else {
-						$this->addTableCell("", $newline);
-					}
+					$lastMonth = mktime(0, 0, 0, date("m", $this->time) - 1, 1, date("Y", $this->time));
+					$lastMonthDays = date("t", $lastMonth);
+					$this->addTableCell(mktime(0, 0, 0, date("m", $this->time) - 1, $lastMonthDays - $daysFromLastMonth + $i + 1, date("Y", $this->time)), $newline, "last_month_days");
 				} elseif ($i - $daysFromLastMonth >= $totalDaysInMonth) {
-					if (! $this->showOnlyDaysOfThisMonth) {
-						$this->addTableCell(($i - $totalDaysInMonth - $daysFromLastMonth + 1), $newline, "last_month_days");
-					} else {
-						$this->addTableCell("", $newline);
-					}
+					$this->addTableCell(mktime(0, 0, 0, date("m", $this->time) + 1, ($i - $totalDaysInMonth - $daysFromLastMonth + 1), date("Y", $this->time)), $newline, "last_month_days");
 				} else {
-					if ($i - $daysFromLastMonth + 1 == date("d", $this->time)) {
-						$this->addTableCell(($i - $daysFromLastMonth + 1), $newline, "current_day");
+					$currentDayTimeStamp = mktime(0, 0, 0, date("m", $this->time), ($i - $daysFromLastMonth + 1), date("Y", $this->time));
+					if (date("dmY", $currentDayTimeStamp) == date("dmY", time())) {
+						$this->addTableCell($currentDayTimeStamp, $newline, "current_day");
 					} else {
-						$this->addTableCell(($i - $daysFromLastMonth + 1), $newline);
+						$this->addTableCell($currentDayTimeStamp, $newline);
 					}
 				}
 			}
@@ -128,10 +123,14 @@ class Calendar
 		if ($newline) {
 			$this->output .= "\t\t<tr>\n";
 		}
+		if (date("mY", time()) != date("mY", $input) && $this->showOnlyDaysOfThisMonth) {
+			$input = "";
+		} else {
+			$input = date($this->dayFormat, $input);
+		}
 		
-		if(array_key_exists("day_of_month", $this->styleClasses))
-		{
-			$input = "<div" . $this->checkForStyleClass("day_of_month") . ">". $input ."</div>";
+		if (array_key_exists("day_of_month", $this->styleClasses)) {
+			$input = "<div" . $this->checkForStyleClass("day_of_month") . ">" . $input . "</div>";
 		}
 		
 		if ($class === null) {
@@ -226,6 +225,16 @@ class Calendar
 			}
 		} else {
 			$this->errorList["Startweekday not found"] = "The weekday you specified mustn't be a shortcut.";
+		}
+	}
+
+	public function showDaysWithLeadingZeros ($boolean)
+	{
+		$showZeros = $this->getBoolean($boolean, "false");
+		if ($showZeros) {
+			$this->dayFormat = 'd';
+		} else {
+			$this->dayFormat = 'j';
 		}
 	}
 }
