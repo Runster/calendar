@@ -15,11 +15,14 @@ Then, you have to create an instance of the calender:
 $calendar = new Calendar();
 ```
 
-After that, you can generate the calendar:
+After that, you have to load the configuration and other required data:
 ```
-$calendar->generateFullCalendar();
+$calendar->loadInputFile("calendar/calendar_data_german.json");
 ```
+
 In the end, you can display the calendar:
 ```
 echo $calendar->output();
 ```
+
+You can find an example configuration in calendar/calendar_data_german.json with in german translated weekdays.

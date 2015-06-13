@@ -20,8 +20,10 @@ class Calendar
 	private $setStartWeekdayRequired = false;
 
 	private $startWeekday = "Saturday";
-	
+
 	private $dayFormat = 'j';
+
+	private $jsonFile = null;
 
 	public function __construct ()
 	{
@@ -142,24 +144,10 @@ class Calendar
 		$this->firstline = false;
 	}
 
-	public function setWeekdays ($weekdaysArray)
-	{
-		if (count($weekdaysArray) == 7) {
-			$this->weekdays = $weekdaysArray;
-			$this->setStartWeekdayRequired = true;
-		} else {
-			$this->errorList["Wrong size array"] = "Your specified weekday-array hasn't the size of seven items.";
-		}
-	}
-
 	public function output ()
 	{
+		$this->generateFullCalendar();
 		return $this->output;
-	}
-
-	public function showOnlyDaysOfThisMonth ($boolean)
-	{
-		$this->showOnlyDaysOfThisMonth = $this->getBoolean($boolean, $this->showOnlyDaysOfThisMonth);
 	}
 
 	private function getBoolean ($booleanToCheck, $default)
@@ -193,48 +181,85 @@ class Calendar
 		}
 	}
 
-	public function addStyleClasses ($styleClasses)
+	public function loadInputFile ($filepath)
 	{
-		if (is_array($styleClasses)) {
-			$this->styleClasses = $styleClasses;
-		} else {
-			$this->errorList["Array error"] = "One of your parameters isn't an array.";
+		$this->jsonFile = json_decode(file_get_contents($filepath), true);
+		
+		$this->getShowDaysWithLeadingZeros();
+		$this->getShowOnlyDaysOfThisMonth();
+		$this->getStyleClasses();
+		$this->getWeekdays();
+		$this->getStartWeekday();
+	}
+
+	public function getShowDaysWithLeadingZeros ()
+	{
+		if (isset($this->jsonFile["ShowDaysWithLeadingZeros"])) {
+			$showZeros = $this->getBoolean($this->jsonFile["ShowDaysWithLeadingZeros"], "false");
+			if ($showZeros) {
+				$this->dayFormat = 'd';
+			} else {
+				$this->dayFormat = 'j';
+			}
 		}
 	}
 
-	public function setStartWeekday ($startWeekday)
+	public function getStyleClasses ()
 	{
-		if (strlen($startWeekday) > 3) {
-			if (array_key_exists($startWeekday, $this->weekdays)) {
-				$this->startWeekday = $startWeekday;
-				$this->initWeekdays();
-				$this->setStartWeekdayRequired = false;
+		if (isset($this->jsonFile["StyleClasses"])) {
+			if (is_array($this->jsonFile["StyleClasses"])) {
+				$this->styleClasses = $this->jsonFile["StyleClasses"];
 			} else {
-				$found = false;
-				foreach ($this->weekdays as $weekday) {
-					if ($weekday["long"] == $startWeekday) {
-						$this->startWeekday = key($weekday);
-						$found = true;
-						$this->initWeekdays();
-						$this->setStartWeekdayRequired = false;
+				$this->errorList["Array error"] = "One of your parameters isn't an array.";
+			}
+		}
+	}
+
+	public function getStartWeekday ()
+	{
+		if (isset($this->jsonFile["StartWeekday"])) {
+			$startWeekday = $this->jsonFile["StartWeekday"];
+			if (strlen($startWeekday) > 3) {
+				if (array_key_exists($startWeekday, $this->weekdays)) {
+					$this->startWeekday = $startWeekday;
+					$this->initWeekdays();
+					$this->setStartWeekdayRequired = false;
+				} else {
+					$found = false;
+					foreach ($this->weekdays as $weekday) {
+						if ($weekday["long"] == $startWeekday) {
+							$this->startWeekday = key($weekday);
+							$found = true;
+							$this->initWeekdays();
+							$this->setStartWeekdayRequired = false;
+						}
+					}
+					if (! $found) {
+						$this->errorList["Startweekday not found"] = "The weekday you specified is not in the weekdays-array.";
 					}
 				}
-				if (! $found) {
-					$this->errorList["Startweekday not found"] = "The weekday you specified is not in the weekdays-array.";
-				}
+			} else {
+				$this->errorList["Startweekday not found"] = "The weekday you specified mustn't be a shortcut.";
 			}
-		} else {
-			$this->errorList["Startweekday not found"] = "The weekday you specified mustn't be a shortcut.";
 		}
 	}
 
-	public function showDaysWithLeadingZeros ($boolean)
+	public function getWeekdays ()
 	{
-		$showZeros = $this->getBoolean($boolean, "false");
-		if ($showZeros) {
-			$this->dayFormat = 'd';
-		} else {
-			$this->dayFormat = 'j';
+		if (isset($this->jsonFile["Weekdays"])) {
+			if (count($this->jsonFile["Weekdays"]) == 7) {
+				$this->weekdays = $this->jsonFile["Weekdays"];
+				$this->setStartWeekdayRequired = true;
+			} else {
+				$this->errorList["Wrong size array"] = "Your specified weekday-array hasn't the size of seven items.";
+			}
+		}
+	}
+
+	public function getShowOnlyDaysOfThisMonth ()
+	{
+		if (isset($this->jsonFile["ShowOnlyDaysOfThisMonth"])) {
+			$this->showOnlyDaysOfThisMonth = $this->getBoolean($this->jsonFile["ShowOnlyDaysOfThisMonth"], $this->showOnlyDaysOfThisMonth);
 		}
 	}
 }

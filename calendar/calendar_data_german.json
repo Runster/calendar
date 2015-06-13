@@ -1,0 +1,51 @@
+{
+	"StartWeekday" : "Saturday",
+	"ShowDaysWithLeadingZeros" : false,
+	"ShowOnlyDaysOfThisMonth" : false,
+	
+	"StyleClasses" : {
+		"table" : "calender_table",
+		"last_month_days" :  "last_month",
+		"current_day" : "currentDay",
+		"day_of_month" : "day_of_month"
+	},
+	
+	"Weekdays" : {
+				
+				"Monday" : {
+						"short": "Mo",
+						"long" : "Montag"
+						
+				},
+				
+				"Tuesday" : {
+						"short" : "Di",
+						"long" : "Dienstag"
+				},
+				
+				"Wednesday" : {
+						"short" : "Mi",
+						"long" : "Mittwoch"
+				},
+				
+				"Thursday" : {
+						"short" : "Do",
+						"long" : "Donnerstag"
+				},
+				
+				"Friday" : {
+						"short" : "Fr",
+						"long" : "Freitag"
+				},
+				
+				"Saturday" : {
+						"short" : "Sa",
+						"long" : "Samstag"
+				},
+				
+				"Sunday" : {
+						"short" : "So",
+						"long" : "Sonntag"
+				}
+	}
+}
