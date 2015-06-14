@@ -24,6 +24,8 @@ class Calendar
 	private $dayFormat = 'j';
 
 	private $jsonFile = null;
+	
+	private $headline = null;
 
 	public function __construct ()
 	{
@@ -32,7 +34,7 @@ class Calendar
 		$this->initWeekdays();
 	}
 
-	public function generateFullCalendar ()
+	private function generateFullCalendar ()
 	{
 		if (! $this->setStartWeekdayRequired) {
 			$this->createTableHeader();
@@ -98,7 +100,11 @@ class Calendar
 	private function createTableHeader ()
 	{
 		$this->output .= "<table" . $this->checkForStyleClass("table") . ">\n";
-		$this->output .= "\t<caption>" . date("F Y", $this->time) . "</caption>\n";
+		if($this->headline != null)
+		{
+			$captionOutput = str_replace(array("[month]", "[year]"), array(date("F", $this->time), date("Y", $this->time)), $this->headline);
+			$this->output .= "\t<caption>" . $captionOutput . "</caption>\n";
+		}
 		$this->output .= "\t<thead>\n";
 		$this->output .= "\t\t<tr>\n";
 		foreach ($this->weekdays as $weekdayData) {
@@ -190,9 +196,17 @@ class Calendar
 		$this->getStyleClasses();
 		$this->getWeekdays();
 		$this->getStartWeekday();
+		$this->getHeadline();
+	}
+	
+	private function getHeadline()
+	{
+		if (isset($this->jsonFile["Headline"])) {
+			$this->headline = $this->jsonFile["Headline"];
+		}
 	}
 
-	public function getShowDaysWithLeadingZeros ()
+	private function getShowDaysWithLeadingZeros ()
 	{
 		if (isset($this->jsonFile["ShowDaysWithLeadingZeros"])) {
 			$showZeros = $this->getBoolean($this->jsonFile["ShowDaysWithLeadingZeros"], "false");
@@ -204,7 +218,7 @@ class Calendar
 		}
 	}
 
-	public function getStyleClasses ()
+	private function getStyleClasses ()
 	{
 		if (isset($this->jsonFile["StyleClasses"])) {
 			if (is_array($this->jsonFile["StyleClasses"])) {
@@ -215,7 +229,7 @@ class Calendar
 		}
 	}
 
-	public function getStartWeekday ()
+	private function getStartWeekday ()
 	{
 		if (isset($this->jsonFile["StartWeekday"])) {
 			$startWeekday = $this->jsonFile["StartWeekday"];
@@ -244,7 +258,7 @@ class Calendar
 		}
 	}
 
-	public function getWeekdays ()
+	private function getWeekdays ()
 	{
 		if (isset($this->jsonFile["Weekdays"])) {
 			if (count($this->jsonFile["Weekdays"]) == 7) {
@@ -256,7 +270,7 @@ class Calendar
 		}
 	}
 
-	public function getShowOnlyDaysOfThisMonth ()
+	private function getShowOnlyDaysOfThisMonth ()
 	{
 		if (isset($this->jsonFile["ShowOnlyDaysOfThisMonth"])) {
 			$this->showOnlyDaysOfThisMonth = $this->getBoolean($this->jsonFile["ShowOnlyDaysOfThisMonth"], $this->showOnlyDaysOfThisMonth);

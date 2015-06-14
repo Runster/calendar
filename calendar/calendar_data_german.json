@@ -2,9 +2,10 @@
 	"StartWeekday" : "Saturday",
 	"ShowDaysWithLeadingZeros" : false,
 	"ShowOnlyDaysOfThisMonth" : false,
+	"Headline" : "[month] [year]",
 	
 	"StyleClasses" : {
-		"table" : "calender_table",
+		"table" : "calendar_table",
 		"last_month_days" :  "last_month",
 		"current_day" : "currentDay",
 		"day_of_month" : "day_of_month"
