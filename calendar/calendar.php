@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Creates a calendar which can be easily included in the website
+ * @author Runster
+ * @license https://creativecommons.org/licenses/by-sa/4.0/ CC BY-SA 4.0
+ */
 class Calendar
 {
 
@@ -24,7 +29,7 @@ class Calendar
 	private $dayFormat = 'j';
 
 	private $jsonFile = null;
-	
+
 	private $headline = null;
 
 	public function __construct ()
@@ -34,6 +39,11 @@ class Calendar
 		$this->initWeekdays();
 	}
 
+	/**
+	 * Generates the calendar.
+	 * Calculates the number of rows and the number of days
+	 * before and after the current month.
+	 */
 	private function generateFullCalendar ()
 	{
 		if (! $this->setStartWeekdayRequired) {
@@ -72,6 +82,9 @@ class Calendar
 		}
 	}
 
+	/**
+	 * Generates a list of all weekdays
+	 */
 	private function initWeekdays ()
 	{
 		if (empty($this->weekdays) === true) {
@@ -97,12 +110,20 @@ class Calendar
 		}
 	}
 
+	/**
+	 * Creates the table header
+	 */
 	private function createTableHeader ()
 	{
 		$this->output .= "<table" . $this->checkForStyleClass("table") . ">\n";
-		if($this->headline != null)
-		{
-			$captionOutput = str_replace(array("[month]", "[year]"), array(date("F", $this->time), date("Y", $this->time)), $this->headline);
+		if ($this->headline != null) {
+			$captionOutput = str_replace(array(
+					"[month]",
+					"[year]"
+			), array(
+					date("F", $this->time),
+					date("Y", $this->time)
+			), $this->headline);
 			$this->output .= "\t<caption>" . $captionOutput . "</caption>\n";
 		}
 		$this->output .= "\t<thead>\n";
@@ -115,6 +136,9 @@ class Calendar
 		$this->output .= "\t<tbody>\n";
 	}
 
+	/**
+	 * Creates the table footer, which closes all opened HTML tags
+	 */
 	private function createTableFooter ()
 	{
 		$this->output .= "\t\t</tr>\n";
@@ -122,6 +146,17 @@ class Calendar
 		$this->output .= "</table>";
 	}
 
+	/**
+	 * Creates one cell in the table.
+	 * It also checks, which style is combined with this day
+	 * 
+	 * @param int $input
+	 *        	The day as a timestamp
+	 * @param boolean $newline
+	 *        	Is this day shown in a new cell
+	 * @param string $class
+	 *        	Which class is combined to this cell
+	 */
 	private function addTableCell ($input, $newline, $class = null)
 	{
 		if ($newline && ! $this->firstline) {
@@ -150,12 +185,27 @@ class Calendar
 		$this->firstline = false;
 	}
 
+	/**
+	 * Calls the generateFullCalendar() method to generate the calendar
+	 * 
+	 * @return string The calendar as HTML
+	 */
 	public function output ()
 	{
 		$this->generateFullCalendar();
 		return $this->output;
 	}
 
+	/**
+	 * Checks, if the passed parameter is a valid boolean
+	 * 
+	 * @param boolean|string $booleanToCheck
+	 *        	Boolean to check
+	 * @param boolean $default
+	 *        	Set the default output
+	 * @return boolean If the passed parameter is a valid boolean, it returns
+	 *         the boolean, otherwise it will return the default value
+	 */
 	private function getBoolean ($booleanToCheck, $default)
 	{
 		if (is_bool($booleanToCheck)) {
@@ -171,6 +221,11 @@ class Calendar
 		return $default;
 	}
 
+	/**
+	 * Creates a list of all occured errors
+	 * 
+	 * @return string The list of all occured errors as HTML code
+	 */
 	public function getErrors ()
 	{
 		$error_output = "";
@@ -180,6 +235,13 @@ class Calendar
 		return $error_output;
 	}
 
+	/**
+	 * Checks if there is a style tag for this tag
+	 * 
+	 * @param string $tagName
+	 *        	The internal name of the style
+	 * @return string The user specified class name for this tag
+	 */
 	private function checkForStyleClass ($tagName)
 	{
 		if (array_key_exists($tagName, $this->styleClasses)) {
@@ -187,6 +249,12 @@ class Calendar
 		}
 	}
 
+	/**
+	 * Loads the json file and calls all configuration methods
+	 * 
+	 * @param string $filepath
+	 *        	Path to the json file
+	 */
 	public function loadInputFile ($filepath)
 	{
 		$this->jsonFile = json_decode(file_get_contents($filepath), true);
@@ -198,14 +266,21 @@ class Calendar
 		$this->getStartWeekday();
 		$this->getHeadline();
 	}
-	
-	private function getHeadline()
+
+	/**
+	 * Reads from the config file the headline for the calendar
+	 */
+	private function getHeadline ()
 	{
 		if (isset($this->jsonFile["Headline"])) {
 			$this->headline = $this->jsonFile["Headline"];
 		}
 	}
 
+	/**
+	 * Reads from the config file the value, if the leading zeros are shown or
+	 * not
+	 */
 	private function getShowDaysWithLeadingZeros ()
 	{
 		if (isset($this->jsonFile["ShowDaysWithLeadingZeros"])) {
@@ -218,6 +293,10 @@ class Calendar
 		}
 	}
 
+	/**
+	 * Reads from the config file the style classes combined to the internal
+	 * names
+	 */
 	private function getStyleClasses ()
 	{
 		if (isset($this->jsonFile["StyleClasses"])) {
@@ -229,6 +308,9 @@ class Calendar
 		}
 	}
 
+	/**
+	 * Reads from the config file the weekday the calendar starts with
+	 */
 	private function getStartWeekday ()
 	{
 		if (isset($this->jsonFile["StartWeekday"])) {
@@ -258,6 +340,9 @@ class Calendar
 		}
 	}
 
+	/**
+	 * Reads from the config file the list with names of all weekdays
+	 */
 	private function getWeekdays ()
 	{
 		if (isset($this->jsonFile["Weekdays"])) {
@@ -270,6 +355,10 @@ class Calendar
 		}
 	}
 
+	/**
+	 * Reads from the config file the value, if only the days from the current
+	 * month are shown or not
+	 */
 	private function getShowOnlyDaysOfThisMonth ()
 	{
 		if (isset($this->jsonFile["ShowOnlyDaysOfThisMonth"])) {
