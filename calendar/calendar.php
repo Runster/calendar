@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Creates a calendar which can be easily included in the website
+ * Creates a calendar that can be easily included in the website
  * @author Runster
  * @license https://creativecommons.org/licenses/by-sa/4.0/ CC BY-SA 4.0
  */
@@ -31,6 +31,8 @@ class Calendar
 	private $jsonFile = null;
 
 	private $headline = null;
+
+	private $eventList = array();
 
 	public function __construct ()
 	{
@@ -137,7 +139,7 @@ class Calendar
 	}
 
 	/**
-	 * Creates the table footer, which closes all opened HTML tags
+	 * Creates the table footer, that closes any opened HTML tags
 	 */
 	private function createTableFooter ()
 	{
@@ -149,7 +151,7 @@ class Calendar
 	/**
 	 * Creates one cell in the table.
 	 * It also checks, which style is combined with this day
-	 * 
+	 *
 	 * @param int $input
 	 *        	The day as a timestamp
 	 * @param boolean $newline
@@ -166,6 +168,25 @@ class Calendar
 		if ($newline) {
 			$this->output .= "\t\t<tr>\n";
 		}
+		
+		$event = "";
+		
+		foreach ($this->eventList as $eventName => $eventData) {
+			if (strlen($eventData["date"]) < 3 && is_numeric($eventData["date"])) {
+				if ($eventData["date"] == date("d", $input) || $eventData["date"] == date("j", $input)) {
+					$event = "<div" . $this->checkForStyleClass("event") . ">". $eventName . "</div>";
+				}
+			}
+			else 
+			{
+				$eventTimeTimestamp = strtotime($eventData["date"]);
+				if(date("d.m.Y", $eventTimeTimestamp) == date("d.m.Y", $input))
+				{
+					$event = "<div" . $this->checkForStyleClass("event") . ">". $eventName . "</div>";
+				}
+			}
+		}
+		
 		if (date("mY", time()) != date("mY", $input) && $this->showOnlyDaysOfThisMonth) {
 			$input = "";
 		} else {
@@ -177,9 +198,9 @@ class Calendar
 		}
 		
 		if ($class === null) {
-			$this->output .= "\t\t\t<td>" . $input . "</td>\n";
+			$this->output .= "\t\t\t<td>" . $input . " " . $event . "</td>\n";
 		} else {
-			$this->output .= "\t\t\t<td" . $this->checkForStyleClass($class) . ">" . $input . "</td>\n";
+			$this->output .= "\t\t\t<td" . $this->checkForStyleClass($class) . ">" . $input . "" . $event . "</td>\n";
 		}
 		
 		$this->firstline = false;
@@ -187,7 +208,7 @@ class Calendar
 
 	/**
 	 * Calls the generateFullCalendar() method to generate the calendar
-	 * 
+	 *
 	 * @return string The calendar as HTML
 	 */
 	public function output ()
@@ -198,7 +219,7 @@ class Calendar
 
 	/**
 	 * Checks, if the passed parameter is a valid boolean
-	 * 
+	 *
 	 * @param boolean|string $booleanToCheck
 	 *        	Boolean to check
 	 * @param boolean $default
@@ -223,7 +244,7 @@ class Calendar
 
 	/**
 	 * Creates a list of all occured errors
-	 * 
+	 *
 	 * @return string The list of all occured errors as HTML code
 	 */
 	public function getErrors ()
@@ -237,7 +258,7 @@ class Calendar
 
 	/**
 	 * Checks if there is a style tag for this tag
-	 * 
+	 *
 	 * @param string $tagName
 	 *        	The internal name of the style
 	 * @return string The user specified class name for this tag
@@ -251,7 +272,7 @@ class Calendar
 
 	/**
 	 * Loads the json file and calls all configuration methods
-	 * 
+	 *
 	 * @param string $filepath
 	 *        	Path to the json file
 	 */
@@ -265,6 +286,7 @@ class Calendar
 		$this->getWeekdays();
 		$this->getStartWeekday();
 		$this->getHeadline();
+		$this->getEvents();
 	}
 
 	/**
@@ -274,6 +296,16 @@ class Calendar
 	{
 		if (isset($this->jsonFile["Headline"])) {
 			$this->headline = $this->jsonFile["Headline"];
+		}
+	}
+
+	/**
+	 * Reads from the config file the list of all events
+	 */
+	private function getEvents ()
+	{
+		if (isset($this->jsonFile["Events"])) {
+			$this->eventList = $this->jsonFile["Events"];
 		}
 	}
 

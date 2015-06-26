@@ -8,7 +8,8 @@
 		"table" : "calendar_table",
 		"last_month_days" :  "last_month",
 		"current_day" : "currentDay",
-		"day_of_month" : "day_of_month"
+		"day_of_month" : "day_of_month",
+		"event" : "event"
 	},
 	
 	"Weekdays" : {
@@ -48,5 +49,17 @@
 						"short" : "So",
 						"long" : "Sonntag"
 				}
+	},
+	
+	"Events" : {
+		
+				"Example every month event" : {
+						"date": "05"
+				},
+				
+				"Example unique event" : {
+						"date" : "24.06.2015"
+				}
 	}
+
 }
