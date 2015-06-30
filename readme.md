@@ -1,7 +1,9 @@
 #About
 This project let you implement a calendar in your website. This calendar is very flexible: You can choose between different settings and you are also able to give this calendar your own style!
-[Calendar in english](http://i.imgur.com/MiRlZ9i.png)
-[Calendar in german](http://i.imgur.com/1gesViR.png)
+
+* [Calendar in English](http://i.imgur.com/MiRlZ9i.png)
+* [Calendar in German](http://i.imgur.com/1gesViR.png)
+
 #Licence
 This code is licensed under the terms of [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 
@@ -11,7 +13,7 @@ First, you have to include the required files:
 require_once 'calendar/calendar.php';
 ```
 
-Then, you have to create an instance of the calender:
+Then, you have to create an instance of the calendar:
 ```
 $calendar = new Calendar();
 ```

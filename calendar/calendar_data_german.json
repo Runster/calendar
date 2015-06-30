@@ -58,7 +58,13 @@
 				},
 				
 				"Example unique event" : {
-						"date" : "24.06.2015"
+						"date" : "24.06.2015",
+						"days" : "1"
+				},
+				
+				"Several days event" : {
+						"date": "14",
+						"days": "2"
 				}
 	}
 

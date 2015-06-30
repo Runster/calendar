@@ -172,21 +172,30 @@ class Calendar
 		$event = "";
 		
 		foreach ($this->eventList as $eventName => $eventData) {
-			if (strlen($eventData["date"]) < 3 && is_numeric($eventData["date"])) {
-				if ($eventData["date"] == date("d", $input) || $eventData["date"] == date("j", $input)) {
-					$event = "<div" . $this->checkForStyleClass("event") . ">". $eventName . "</div>";
-				}
-			}
-			else 
+			if(!isset($eventData["days"]) || $eventData["days"] == "0")
 			{
-				$eventTimeTimestamp = strtotime($eventData["date"]);
-				if(date("d.m.Y", $eventTimeTimestamp) == date("d.m.Y", $input))
+				$eventData["days"] = "1";
+			}
+			$tempEventStartDate = $eventData["date"];
+			for($i = 0; $i < $eventData["days"]; $i++)
+			{
+				$eventData["date"] = $tempEventStartDate;
+				if (strlen($eventData["date"]) < 3 && is_numeric($eventData["date"])) {
+					$eventData["date"] = $eventData["date"] + $i;
+					if ($eventData["date"] == date("d", $input) || $eventData["date"] == date("j", $input)) {
+						$event .= "<div" . $this->checkForStyleClass("event") . ">". $eventName . "</div>";
+					}
+				}
+				else 
 				{
-					$event = "<div" . $this->checkForStyleClass("event") . ">". $eventName . "</div>";
+					$eventTimeTimestamp = strtotime($eventData["date"]) + ($i * 86400);
+					if(date("d.m.Y", $eventTimeTimestamp) == date("d.m.Y", $input))
+					{
+						$event .= "<div" . $this->checkForStyleClass("event") . ">". $eventName . "</div>";
+					}
 				}
 			}
 		}
-		
 		if (date("mY", time()) != date("mY", $input) && $this->showOnlyDaysOfThisMonth) {
 			$input = "";
 		} else {
@@ -200,7 +209,7 @@ class Calendar
 		if ($class === null) {
 			$this->output .= "\t\t\t<td>" . $input . " " . $event . "</td>\n";
 		} else {
-			$this->output .= "\t\t\t<td" . $this->checkForStyleClass($class) . ">" . $input . "" . $event . "</td>\n";
+			$this->output .= "\t\t\t<td" . $this->checkForStyleClass($class) . ">" . $input . " " . $event . "</td>\n";
 		}
 		
 		$this->firstline = false;
