@@ -15,6 +15,8 @@ class Calendar
 	private $firstline;
 
 	private $showOnlyDaysOfThisMonth = false;
+	
+	private $showCalendarWeek = false;
 
 	private $weekdays = array();
 
@@ -33,6 +35,8 @@ class Calendar
 	private $headline = null;
 
 	private $eventList = array();
+	
+	private $shortcutCW = "CW";
 
 	public function __construct ()
 	{
@@ -130,6 +134,10 @@ class Calendar
 		}
 		$this->output .= "\t<thead>\n";
 		$this->output .= "\t\t<tr>\n";
+		if($this->showCalendarWeek)
+		{
+			$this->output .= "\t\t\t<td>". $this->shortcutCW ."</td>\n";
+		}
 		foreach ($this->weekdays as $weekdayData) {
 			$this->output .= "\t\t\t<td>" . $weekdayData["short"] . "</td>\n";
 		}
@@ -167,6 +175,17 @@ class Calendar
 		
 		if ($newline) {
 			$this->output .= "\t\t<tr>\n";
+			if($this->showCalendarWeek)
+			{
+				if(date("W", $input) == date("W", $input + 604799))
+				{
+					$this->output .= "\t\t\t<td" . $this->checkForStyleClass("calendarweek_column") . ">". date("W", $input) ."</td>\n";
+				}
+				else
+				{
+					$this->output .= "\t\t\t<td" . $this->checkForStyleClass("calendarweek_column") . ">". date("W", $input) ." / ". date("W", $input + 604799) ."</td>\n";
+				}
+			}
 		}
 		
 		$event = "";
@@ -291,11 +310,13 @@ class Calendar
 		
 		$this->getShowDaysWithLeadingZeros();
 		$this->getShowOnlyDaysOfThisMonth();
+		$this->getShowCalendarWeek();
 		$this->getStyleClasses();
 		$this->getWeekdays();
 		$this->getStartWeekday();
 		$this->getHeadline();
 		$this->getEvents();
+		$this->getTranslations();
 	}
 
 	/**
@@ -307,6 +328,16 @@ class Calendar
 			$this->headline = $this->jsonFile["Headline"];
 		}
 	}
+	
+	/**
+	 * Reads from the config file the translation of used words
+	 */
+	private function getTranslations ()
+	{
+		if (isset($this->jsonFile["translations"]["CW"])) {
+			$this->shortcutCW = $this->jsonFile["translations"]["CW"];
+		}
+	}
 
 	/**
 	 * Reads from the config file the list of all events
@@ -315,6 +346,13 @@ class Calendar
 	{
 		if (isset($this->jsonFile["Events"])) {
 			$this->eventList = $this->jsonFile["Events"];
+		}
+	}
+	
+	private function getShowCalendarWeek()
+	{
+		if (isset($this->jsonFile["ShowCalendarWeek"])) {
+			$this->showCalendarWeek = $this->getBoolean($this->jsonFile["ShowCalendarWeek"], $this->showCalendarWeek);
 		}
 	}
 

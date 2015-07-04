@@ -1,15 +1,21 @@
 {
-	"StartWeekday" : "Saturday",
+	"StartWeekday" : "Monday",
 	"ShowDaysWithLeadingZeros" : false,
 	"ShowOnlyDaysOfThisMonth" : false,
 	"Headline" : "[month] [year]",
+	"ShowCalendarWeek" : true,
+	
+	"translations" : {
+		"CW" : "KW"
+	},
 	
 	"StyleClasses" : {
 		"table" : "calendar_table",
 		"last_month_days" :  "last_month",
 		"current_day" : "currentDay",
 		"day_of_month" : "day_of_month",
-		"event" : "event"
+		"event" : "event",
+		"calendarweek_column" : "calendarWeek"
 	},
 	
 	"Weekdays" : {
@@ -58,7 +64,7 @@
 				},
 				
 				"Example unique event" : {
-						"date" : "24.06.2015",
+						"date" : "24.07.2015",
 						"days" : "1"
 				},
 				
