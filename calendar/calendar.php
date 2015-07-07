@@ -304,7 +304,7 @@ class Calendar
 	 * @param string $filepath
 	 *        	Path to the json file
 	 */
-	public function loadInputFile ($filepath)
+	public function loadConfigFile ($filepath)
 	{
 		$this->jsonFile = json_decode(file_get_contents($filepath), true);
 		
@@ -349,6 +349,9 @@ class Calendar
 		}
 	}
 	
+	/**
+	 * Reads from the config file äthe option to show the calendar week or not
+	 */
 	private function getShowCalendarWeek()
 	{
 		if (isset($this->jsonFile["ShowCalendarWeek"])) {
