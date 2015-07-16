@@ -8,7 +8,7 @@ You can choose between different settings:
 
 You can give the calendar completely your own style!
 
-Screenshots of the calendar
+Screenshots of the calendar:
 * [in English](http://i.imgur.com/E8VCMSU.png)
 * [in German](http://i.imgur.com/2cYTXr2.png)
 
@@ -16,17 +16,17 @@ Screenshots of the calendar
 This code is licensed under the terms of [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 
 #Simple integration
-First, you have to include the required files:
+First, you have to include the required file:
 ```
 require_once 'calendar/calendar.php';
 ```
 
-Then, you have to create an instance of the calendar:
+Then, you need to create an instance of the calendar:
 ```
 $calendar = new Calendar();
 ```
 
-After that, you have to load the configuration and other required data:
+After that, you have to load the configuration file:
 ```
 $calendar->loadConfigFile("calendar/calendar_data_german.json");
 ```
@@ -36,10 +36,10 @@ In the end, you can display the calendar:
 echo $calendar->output();
 ```
 
-You also have the chance to display all errors:
+You also have the ability to output all errors:
 
 ```
 echo $calendar->getErrors();
 ```
 
-You can find an example configuration in *calendar/calendar_data_german.json* with in german translated weekdays.
+You can find a German translated example configuration in *calendar/calendar_data_german.json*.

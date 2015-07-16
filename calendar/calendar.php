@@ -12,7 +12,7 @@ class Calendar
 
 	private $output = "";
 
-	private $firstline;
+	private $firstline = true;
 
 	private $showOnlyDaysOfThisMonth = false;
 	
@@ -41,7 +41,6 @@ class Calendar
 	public function __construct ()
 	{
 		$this->time = time();
-		$this->firstline = true;
 		$this->initWeekdays();
 	}
 
@@ -163,7 +162,7 @@ class Calendar
 	 * @param int $input
 	 *        	The day as a timestamp
 	 * @param boolean $newline
-	 *        	Is this day shown in a new cell
+	 *        	Is this day shown in a new row
 	 * @param string $class
 	 *        	Which class is combined to this cell
 	 */
@@ -264,7 +263,7 @@ class Calendar
 		} elseif (strcasecmp($booleanToCheck, "false") == 0) {
 			return false;
 		} else {
-			$this->errorList["Parse error"] = "One of your parameters isn't a valid boolean.";
+			$this->errorList["Parse error"] = "At least one of your parameters isn't a valid boolean.";
 		}
 		
 		return $default;
@@ -306,17 +305,24 @@ class Calendar
 	 */
 	public function loadConfigFile ($filepath)
 	{
-		$this->jsonFile = json_decode(file_get_contents($filepath), true);
-		
-		$this->getShowDaysWithLeadingZeros();
-		$this->getShowOnlyDaysOfThisMonth();
-		$this->getShowCalendarWeek();
-		$this->getStyleClasses();
-		$this->getWeekdays();
-		$this->getStartWeekday();
-		$this->getHeadline();
-		$this->getEvents();
-		$this->getTranslations();
+		if(file_exists($filepath))
+		{
+			$this->jsonFile = json_decode(file_get_contents($filepath), true);
+			
+			$this->getShowDaysWithLeadingZeros();
+			$this->getShowOnlyDaysOfThisMonth();
+			$this->getShowCalendarWeek();
+			$this->getStyleClasses();
+			$this->getWeekdays();
+			$this->getStartWeekday();
+			$this->getHeadline();
+			$this->getEvents();
+			$this->getTranslations();
+		}
+		else
+		{ 
+			$this->errorList["File not found"] = "The configuration file was not found. Please check the file path.";
+		}
 	}
 
 	/**
@@ -350,7 +356,7 @@ class Calendar
 	}
 	
 	/**
-	 * Reads from the config file äthe option to show the calendar week or not
+	 * Reads from the config file the option to show the calendar week or not
 	 */
 	private function getShowCalendarWeek()
 	{
@@ -385,7 +391,7 @@ class Calendar
 			if (is_array($this->jsonFile["StyleClasses"])) {
 				$this->styleClasses = $this->jsonFile["StyleClasses"];
 			} else {
-				$this->errorList["Array error"] = "One of your parameters isn't an array.";
+				$this->errorList["Array error"] = "At least one of your parameters isn't an array.";
 			}
 		}
 	}
