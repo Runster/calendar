@@ -26,7 +26,6 @@ class CalendarError
 	{
 		if ($this->logFile) {
 			fclose($this->logFile);
-			echo "Datei geschlossen";
 		}
 	}
 
