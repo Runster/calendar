@@ -5,6 +5,8 @@
  * @author Runster
  * @license https://creativecommons.org/licenses/by-sa/4.0/ CC BY-SA 4.0
  */
+require_once "calendarError.php";
+
 class Calendar
 {
 
@@ -15,12 +17,10 @@ class Calendar
 	private $firstline = true;
 
 	private $showOnlyDaysOfThisMonth = false;
-	
+
 	private $showCalendarWeek = false;
 
 	private $weekdays = array();
-
-	private $errorList = array();
 
 	private $styleClasses = array();
 
@@ -35,8 +35,10 @@ class Calendar
 	private $headline = null;
 
 	private $eventList = array();
-	
+
 	private $shortcutCW = "CW";
+
+	private $errorHandling;
 
 	public function __construct ()
 	{
@@ -83,7 +85,7 @@ class Calendar
 			
 			$this->createTableFooter();
 		} else {
-			$this->errorList["Missing field"] = "You must specify a weekday to start.";
+			$this->errorHandling->addError("Missing field", "You must specify a weekday to start.");
 		}
 	}
 
@@ -133,9 +135,8 @@ class Calendar
 		}
 		$this->output .= "\t<thead>\n";
 		$this->output .= "\t\t<tr>\n";
-		if($this->showCalendarWeek)
-		{
-			$this->output .= "\t\t\t<td>". $this->shortcutCW ."</td>\n";
+		if ($this->showCalendarWeek) {
+			$this->output .= "\t\t\t<td>" . $this->shortcutCW . "</td>\n";
 		}
 		foreach ($this->weekdays as $weekdayData) {
 			$this->output .= "\t\t\t<td>" . $weekdayData["short"] . "</td>\n";
@@ -174,15 +175,11 @@ class Calendar
 		
 		if ($newline) {
 			$this->output .= "\t\t<tr>\n";
-			if($this->showCalendarWeek)
-			{
-				if(date("W", $input) == date("W", $input + 604799))
-				{
-					$this->output .= "\t\t\t<td" . $this->checkForStyleClass("calendarweek_column") . ">". date("W", $input) ."</td>\n";
-				}
-				else
-				{
-					$this->output .= "\t\t\t<td" . $this->checkForStyleClass("calendarweek_column") . ">". date("W", $input) ." / ". date("W", $input + 604799) ."</td>\n";
+			if ($this->showCalendarWeek) {
+				if (date("W", $input) == date("W", $input + 604799)) {
+					$this->output .= "\t\t\t<td" . $this->checkForStyleClass("calendarweek_column") . ">" . date("W", $input) . "</td>\n";
+				} else {
+					$this->output .= "\t\t\t<td" . $this->checkForStyleClass("calendarweek_column") . ">" . date("W", $input) . " / " . date("W", $input + 604799) . "</td>\n";
 				}
 			}
 		}
@@ -190,26 +187,21 @@ class Calendar
 		$event = "";
 		
 		foreach ($this->eventList as $eventName => $eventData) {
-			if(!isset($eventData["days"]) || $eventData["days"] == "0")
-			{
+			if (! isset($eventData["days"]) || $eventData["days"] == "0") {
 				$eventData["days"] = "1";
 			}
 			$tempEventStartDate = $eventData["date"];
-			for($i = 0; $i < $eventData["days"]; $i++)
-			{
+			for ($i = 0; $i < $eventData["days"]; $i ++) {
 				$eventData["date"] = $tempEventStartDate;
 				if (strlen($eventData["date"]) < 3 && is_numeric($eventData["date"])) {
 					$eventData["date"] = $eventData["date"] + $i;
 					if ($eventData["date"] == date("d", $input) || $eventData["date"] == date("j", $input)) {
-						$event .= "<div" . $this->checkForStyleClass("event") . ">". $eventName . "</div>";
+						$event .= "<div" . $this->checkForStyleClass("event") . ">" . $eventName . "</div>";
 					}
-				}
-				else 
-				{
+				} else {
 					$eventTimeTimestamp = strtotime($eventData["date"]) + ($i * 86400);
-					if(date("d.m.Y", $eventTimeTimestamp) == date("d.m.Y", $input))
-					{
-						$event .= "<div" . $this->checkForStyleClass("event") . ">". $eventName . "</div>";
+					if (date("d.m.Y", $eventTimeTimestamp) == date("d.m.Y", $input)) {
+						$event .= "<div" . $this->checkForStyleClass("event") . ">" . $eventName . "</div>";
 					}
 				}
 			}
@@ -251,10 +243,12 @@ class Calendar
 	 *        	Boolean to check
 	 * @param boolean $default
 	 *        	Set the default output
+	 * @param string $additionalInformation
+	 *        	Additional specification for the log
 	 * @return boolean If the passed parameter is a valid boolean, it returns
 	 *         the boolean, otherwise it will return the default value
 	 */
-	private function getBoolean ($booleanToCheck, $default)
+	private function getBoolean ($booleanToCheck, $default, $additionalInformation = null)
 	{
 		if (is_bool($booleanToCheck)) {
 			return $booleanToCheck;
@@ -263,7 +257,11 @@ class Calendar
 		} elseif (strcasecmp($booleanToCheck, "false") == 0) {
 			return false;
 		} else {
-			$this->errorList["Parse error"] = "At least one of your parameters isn't a valid boolean.";
+			if ($additionalInformation === null) {
+				$this->errorHandling->addError("Parse error", "At least one of your parameters isn't a valid boolean.");
+			} else {
+				$this->errorHandling->addError("Parse error", "The setting \"" . $additionalInformation . "\" in your configuration file expects a boolean (true/false) as value.");
+			}
 		}
 		
 		return $default;
@@ -277,7 +275,7 @@ class Calendar
 	public function getErrors ()
 	{
 		$error_output = "";
-		foreach ($this->errorList as $error) {
+		foreach ($this->errorHandling->getErrorList() as $error) {
 			$error_output .= "<p>" . $error . "</p>";
 		}
 		return $error_output;
@@ -305,9 +303,10 @@ class Calendar
 	 */
 	public function loadConfigFile ($filepath)
 	{
-		if(file_exists($filepath))
-		{
+		if (file_exists($filepath)) {
 			$this->jsonFile = json_decode(file_get_contents($filepath), true);
+			
+			$this->setErrorHandling();
 			
 			$this->getShowDaysWithLeadingZeros();
 			$this->getShowOnlyDaysOfThisMonth();
@@ -318,10 +317,8 @@ class Calendar
 			$this->getHeadline();
 			$this->getEvents();
 			$this->getTranslations();
-		}
-		else
-		{ 
-			$this->errorList["File not found"] = "The configuration file was not found. Please check the file path.";
+		} else {
+			$this->errorHandling->addError("File not found", "The configuration file was not found. Please check the file path.");
 		}
 	}
 
@@ -334,14 +331,14 @@ class Calendar
 			$this->headline = $this->jsonFile["Headline"];
 		}
 	}
-	
+
 	/**
 	 * Reads from the config file the translation of used words
 	 */
 	private function getTranslations ()
 	{
-		if (isset($this->jsonFile["translations"]["CW"])) {
-			$this->shortcutCW = $this->jsonFile["translations"]["CW"];
+		if (isset($this->jsonFile["Translations"]["CW"])) {
+			$this->shortcutCW = $this->jsonFile["Translations"]["CW"];
 		}
 	}
 
@@ -354,14 +351,14 @@ class Calendar
 			$this->eventList = $this->jsonFile["Events"];
 		}
 	}
-	
+
 	/**
 	 * Reads from the config file the option to show the calendar week or not
 	 */
-	private function getShowCalendarWeek()
+	private function getShowCalendarWeek ()
 	{
 		if (isset($this->jsonFile["ShowCalendarWeek"])) {
-			$this->showCalendarWeek = $this->getBoolean($this->jsonFile["ShowCalendarWeek"], $this->showCalendarWeek);
+			$this->showCalendarWeek = $this->getBoolean($this->jsonFile["ShowCalendarWeek"], $this->showCalendarWeek, "ShowCalendarWeek");
 		}
 	}
 
@@ -372,12 +369,8 @@ class Calendar
 	private function getShowDaysWithLeadingZeros ()
 	{
 		if (isset($this->jsonFile["ShowDaysWithLeadingZeros"])) {
-			$showZeros = $this->getBoolean($this->jsonFile["ShowDaysWithLeadingZeros"], "false");
-			if ($showZeros) {
-				$this->dayFormat = 'd';
-			} else {
-				$this->dayFormat = 'j';
-			}
+			$showZeros = $this->getBoolean($this->jsonFile["ShowDaysWithLeadingZeros"], "false", "ShowDaysWithLeadingZeros");
+			$this->dayFormat = ($showZeros) ? 'd' : 'j';
 		}
 	}
 
@@ -391,7 +384,7 @@ class Calendar
 			if (is_array($this->jsonFile["StyleClasses"])) {
 				$this->styleClasses = $this->jsonFile["StyleClasses"];
 			} else {
-				$this->errorList["Array error"] = "At least one of your parameters isn't an array.";
+				$this->errorHandling->addError("Array error", "At least one of your parameters isn't an array.");
 			}
 		}
 	}
@@ -419,11 +412,11 @@ class Calendar
 						}
 					}
 					if (! $found) {
-						$this->errorList["Startweekday not found"] = "The weekday you specified is not in the weekdays-array.";
+						$this->errorHandling->addError("Startweekday not found", "The weekday you specified is not in the weekdays-array.");
 					}
 				}
 			} else {
-				$this->errorList["Startweekday not found"] = "The weekday you specified mustn't be a shortcut.";
+				$this->errorHandling->addError("Startweekday not found", "The weekday you specified mustn't be a shortcut.");
 			}
 		}
 	}
@@ -438,7 +431,7 @@ class Calendar
 				$this->weekdays = $this->jsonFile["Weekdays"];
 				$this->setStartWeekdayRequired = true;
 			} else {
-				$this->errorList["Wrong size array"] = "Your specified weekday-array hasn't the size of seven items.";
+				$this->errorHandling->addError("Incorrect array size", "Your specified weekday-array hasn't the size of seven items.");
 			}
 		}
 	}
@@ -450,7 +443,27 @@ class Calendar
 	private function getShowOnlyDaysOfThisMonth ()
 	{
 		if (isset($this->jsonFile["ShowOnlyDaysOfThisMonth"])) {
-			$this->showOnlyDaysOfThisMonth = $this->getBoolean($this->jsonFile["ShowOnlyDaysOfThisMonth"], $this->showOnlyDaysOfThisMonth);
+			$this->showOnlyDaysOfThisMonth = $this->getBoolean($this->jsonFile["ShowOnlyDaysOfThisMonth"], $this->showOnlyDaysOfThisMonth, "ShowOnlyDaysOfThisMonth");
 		}
+	}
+
+	/**
+	 * Reads the error handling from the config file.
+	 * The default value is to log every error in a "calendar.logs" file.
+	 */
+	private function setErrorHandling ()
+	{
+		$fileName = "calendar.logs";
+		$createFileLogs = true;
+		
+		if (isset($this->jsonFile["ErrorHandling"]["createFileLogs"])) {
+			$createFileLogs = $this->getBoolean($this->jsonFile["ErrorHandling"]["createFileLogs"], true, "createFileLogs");
+		}
+		
+		if (isset($this->jsonFile["ErrorHandling"]["fileName"])) {
+			$fileName = $this->jsonFile["ErrorHandling"]["fileName"];
+		}
+		
+		$this->errorHandling = new CalendarError($fileName, $createFileLogs);
 	}
 }

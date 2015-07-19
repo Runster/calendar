@@ -5,7 +5,7 @@
 	"Headline" : "[month] [year]",
 	"ShowCalendarWeek" : true,
 	
-	"translations" : {
+	"Translations" : {
 		"CW" : "KW"
 	},
 	
@@ -72,6 +72,11 @@
 						"date": "14",
 						"days": "2"
 				}
+	},
+	
+	"ErrorHandling" : {
+		"createFileLogs" : true,
+		"fileName" : "calendar.logs"
 	}
 
 }
