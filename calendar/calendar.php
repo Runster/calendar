@@ -303,10 +303,10 @@ class Calendar
 	 */
 	public function loadConfigFile ($filepath)
 	{
+		$this->setErrorHandling();
+
 		if (file_exists($filepath)) {
 			$this->jsonFile = json_decode(file_get_contents($filepath), true);
-			
-			$this->setErrorHandling();
 			
 			$this->getShowDaysWithLeadingZeros();
 			$this->getShowOnlyDaysOfThisMonth();
