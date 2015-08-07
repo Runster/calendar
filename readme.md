@@ -9,37 +9,26 @@ You can choose between different settings:
 You can give the calendar completely your own style!
 
 Screenshots of the calendar:
-* [in English](http://i.imgur.com/E8VCMSU.png)
-* [in German](http://i.imgur.com/2cYTXr2.png)
+* [in English](http://i.imgur.com/g67z7wC.png)
+* [in German](http://i.imgur.com/jStdMTb.png)
 
 #Licence
 This code is licensed under the terms of [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 
 #Simple integration
-First, you have to include the required file:
+There are only two little things you've to do.
+
+
+First you must link to the JavaScript files:
 ```
-require_once 'calendar/calendar.php';
+<script src="javascript/jquery-1.11.3.min.js"></script>
+<script src="javascript/calendar.js"></script>
 ```
 
-Then, you need to create an instance of the calendar:
+
+After that, you need to insert the div container into your website, in which the JavaScript code will load the calendar:
 ```
-$calendar = new Calendar();
+<div id="treadar-calendar"></div>
 ```
 
-After that, you have to load the configuration file:
-```
-$calendar->loadConfigFile("calendar/calendar_data_german.json");
-```
-
-In the end, you can display the calendar:
-```
-echo $calendar->output();
-```
-
-You also have the ability to output all errors:
-
-```
-echo $calendar->getErrors();
-```
-
-You can find a German translated example configuration in *calendar/calendar_data_german.json*.
+You'll find a German translated example configuration on *calendar/config/calendar_data_german.json*.
