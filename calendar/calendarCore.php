@@ -178,7 +178,7 @@ class Calendar
 		if ($newline) {
 			$this->output .= "\t\t<tr>\n";
 			if ($this->showCalendarWeek) {
-				if (date("W", $input) == date("W", $input + 604799)) {
+				if (date("W", $input) == date("W", $input + 600000)) {
 					$this->output .= "\t\t\t<td" . $this->checkForStyleClass("calendarweek_column") . ">" . date("W", $input) . "</td>\n";
 				} else {
 					$this->output .= "\t\t\t<td" . $this->checkForStyleClass("calendarweek_column") . ">" . date("W", $input) . " / " . date("W", $input + 604799) . "</td>\n";
