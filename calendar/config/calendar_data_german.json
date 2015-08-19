@@ -3,10 +3,10 @@
 	"ShowDaysWithLeadingZeros" : false,
 	"ShowOnlyDaysOfThisMonth" : false,
 	"Headline" : "[month] [year]",
-	"ShowCalendarWeek" : true,
-	
+
 	"Translations" : {
-		"CW" : "KW"
+		"CW" : "KW",
+		"events_at_this_day" : "%d Termin(e) an diesem Tag"
 	},
 	
 	"StyleClasses" : {
@@ -64,13 +64,17 @@
 				},
 				
 				"Example unique event" : {
-						"date" : "24.07.2015",
+						"date" : "24.08.2015",
 						"days" : "1"
 				},
 				
 				"Several days event" : {
 						"date": "14",
 						"days": "2"
+				},
+				
+				"Example every month event" : {
+					"date": "14"
 				}
 	},
 	

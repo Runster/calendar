@@ -16,8 +16,6 @@ class Calendar
 
 	private $showOnlyDaysOfThisMonth = false;
 
-	private $showCalendarWeek = false;
-
 	private $weekdays = array();
 
 	private $styleClasses = array();
@@ -36,9 +34,12 @@ class Calendar
 
 	private $eventList = array();
 
-	private $shortcutCW = "CW";
-
 	private $errorHandling;
+
+	private $translations = array(
+			"CW" => null,
+			"events_at_this_day" => null
+	);
 
 	public static $mainPath = "";
 
@@ -137,8 +138,8 @@ class Calendar
 		}
 		$this->output .= "\t<thead>\n";
 		$this->output .= "\t\t<tr>\n";
-		if ($this->showCalendarWeek) {
-			$this->output .= "\t\t\t<td>" . $this->shortcutCW . "</td>\n";
+		if ($this->translations["CW"] != null) {
+			$this->output .= "\t\t\t<td>" . $this->translations["CW"] . "</td>\n";
 		}
 		foreach ($this->weekdays as $weekdayData) {
 			$this->output .= "\t\t\t<td>" . $weekdayData["short"] . "</td>\n";
@@ -177,7 +178,7 @@ class Calendar
 		
 		if ($newline) {
 			$this->output .= "\t\t<tr>\n";
-			if ($this->showCalendarWeek) {
+			if ($this->translations["CW"] != null) {
 				if (date("W", $input) == date("W", $input + 600000)) {
 					$this->output .= "\t\t\t<td" . $this->checkForStyleClass("calendarweek_column") . ">" . date("W", $input) . "</td>\n";
 				} else {
@@ -187,7 +188,7 @@ class Calendar
 		}
 		
 		$event = "";
-		
+		$eventCounter = 0;
 		foreach ($this->eventList as $eventName => $eventData) {
 			if (! isset($eventData["days"]) || $eventData["days"] == "0") {
 				$eventData["days"] = "1";
@@ -198,11 +199,13 @@ class Calendar
 				if (strlen($eventData["date"]) < 3 && is_numeric($eventData["date"])) {
 					$eventData["date"] = $eventData["date"] + $i;
 					if ($eventData["date"] == date("d", $input) || $eventData["date"] == date("j", $input)) {
+						$eventCounter ++;
 						$event .= "<div" . $this->checkForStyleClass("event") . ">" . $eventName . "</div>";
 					}
 				} else {
 					$eventTimeTimestamp = strtotime($eventData["date"]) + ($i * 86400);
 					if (date("d.m.Y", $eventTimeTimestamp) == date("d.m.Y", $input)) {
+						$eventCounter ++;
 						$event .= "<div" . $this->checkForStyleClass("event") . ">" . $eventName . "</div>";
 					}
 				}
@@ -212,6 +215,10 @@ class Calendar
 			$input = "";
 		} else {
 			$input = date($this->dayFormat, $input);
+		}
+		
+		if ($this->translations["events_at_this_day"] != null) {
+			$input = "<span title='" . sprintf($this->translations["events_at_this_day"], $eventCounter) . "'>" . $input . "</span>";
 		}
 		
 		if (array_key_exists("day_of_month", $this->styleClasses)) {
@@ -309,7 +316,6 @@ class Calendar
 			
 			$this->getShowDaysWithLeadingZeros();
 			$this->getShowOnlyDaysOfThisMonth();
-			$this->getShowCalendarWeek();
 			$this->getStyleClasses();
 			$this->getWeekdays();
 			$this->getStartWeekday();
@@ -337,7 +343,10 @@ class Calendar
 	private function getTranslations ()
 	{
 		if (isset($this->jsonFile["Translations"]["CW"])) {
-			$this->shortcutCW = $this->jsonFile["Translations"]["CW"];
+			$this->translations["CW"] = $this->jsonFile["Translations"]["CW"];
+		}
+		if (isset($this->jsonFile["Translations"]["events_at_this_day"])) {
+			$this->translations["events_at_this_day"] = $this->jsonFile["Translations"]["events_at_this_day"];
 		}
 	}
 
@@ -348,16 +357,6 @@ class Calendar
 	{
 		if (isset($this->jsonFile["Events"])) {
 			$this->eventList = $this->jsonFile["Events"];
-		}
-	}
-
-	/**
-	 * Reads from the config file the option to show the calendar week or not
-	 */
-	private function getShowCalendarWeek ()
-	{
-		if (isset($this->jsonFile["ShowCalendarWeek"])) {
-			$this->showCalendarWeek = $this->getBoolean($this->jsonFile["ShowCalendarWeek"], $this->showCalendarWeek, "ShowCalendarWeek");
 		}
 	}
 
