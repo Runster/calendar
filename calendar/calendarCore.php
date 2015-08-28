@@ -35,6 +35,8 @@ class Calendar
 	private $eventList = array();
 
 	private $errorHandling;
+	
+	private $eventErrorLogged = false;
 
 	private $translations = array(
 			"CW" => null,
@@ -190,24 +192,36 @@ class Calendar
 		$event = "";
 		$eventCounter = 0;
 		foreach ($this->eventList as $eventName => $eventData) {
-			if (! isset($eventData["days"]) || $eventData["days"] == "0") {
-				$eventData["days"] = "1";
-			}
-			$tempEventStartDate = $eventData["date"];
-			for ($i = 0; $i < $eventData["days"]; $i ++) {
-				$eventData["date"] = $tempEventStartDate;
-				if (strlen($eventData["date"]) < 3 && is_numeric($eventData["date"])) {
-					$eventData["date"] = $eventData["date"] + $i;
-					if ($eventData["date"] == date("d", $input) || $eventData["date"] == date("j", $input)) {
-						$eventCounter ++;
-						$event .= "<div" . $this->checkForStyleClass("event") . ">" . $eventName . "</div>";
+			if (isset($eventData["date"])) {
+				if (! isset($eventData["days"]) || $eventData["days"] == "0") {
+					$eventData["days"] = "1";
+				}
+				$tempEventStartDate = $eventData["date"];
+				
+				for ($i = 0; $i < $eventData["days"]; $i ++) {
+					$eventData["date"] = $tempEventStartDate;
+					$styleClass = $this->checkForStyleClass("event");
+					if (isset($eventData["styleclass"])) {
+						$styleClass = " class=\"" . $eventData["styleclass"] . "\"";
 					}
-				} else {
-					$eventTimeTimestamp = strtotime($eventData["date"]) + ($i * 86400);
-					if (date("d.m.Y", $eventTimeTimestamp) == date("d.m.Y", $input)) {
-						$eventCounter ++;
-						$event .= "<div" . $this->checkForStyleClass("event") . ">" . $eventName . "</div>";
+					if (strlen($eventData["date"]) < 3 && is_numeric($eventData["date"])) {
+						$eventData["date"] = $eventData["date"] + $i;
+						if ($eventData["date"] == date("d", $input) || $eventData["date"] == date("j", $input)) {
+							$eventCounter ++;
+							$event .= "<div" . $styleClass . ">" . $eventName . "</div>";
+						}
+					} else {
+						$eventTimeTimestamp = strtotime($eventData["date"]) + ($i * 86400);
+						if (date("d.m.Y", $eventTimeTimestamp) == date("d.m.Y", $input)) {
+							$eventCounter ++;
+							$event .= "<div" . $styleClass . ">" . $eventName . "</div>";
+						}
 					}
+				}
+			} else {
+				if (! $this->eventErrorLogged) {
+					$this->eventErrorLogged = true;
+					$this->errorHandling->addError("Incorrect event setting", "At least one of your events has no \"date\"-definition.");
 				}
 			}
 		}

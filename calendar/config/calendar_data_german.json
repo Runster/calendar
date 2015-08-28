@@ -70,7 +70,8 @@
 				
 				"Several days event" : {
 						"date": "14",
-						"days": "2"
+						"days": "2",
+						"styleclass" : "event yellow"
 				},
 				
 				"Example every month event" : {
