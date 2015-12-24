@@ -1,0 +1,87 @@
+.calendar_table {
+	border-collapse: collapse;
+	background-color: #F5F5F5;
+	padding: 5px;
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 0.7em;
+}
+
+.calendar_table thead tr {
+	background-color: #999999;
+	border-bottom: 2px solid #3D3D3D;
+	text-transform: uppercase;
+	font-weight: bold;
+	text-align: center;
+	color: #3D3D3D;
+}
+
+.calendar_table thead tr td {
+	padding: 10px;
+	border-left: 1px solid #3D3D3D;
+	border-right: 1px solid #3D3D3D;
+}
+
+.calendar_table .last_month {
+	color: #C2C2C2;
+}
+
+.calendar_table caption{
+	background-color: #3D3D3D;
+	text-transform: uppercase;
+	color: #F5F5F5;
+	padding: 5px;
+	font-weight: bold;
+}
+
+.calendar_table caption a{
+	text-decoration: none;
+	color: #F5F5F5;
+	border-bottom: 0px;
+}
+
+.calendar_table caption span{
+	display: inline-block;
+	width: 175px;
+	text-align: center;
+}
+
+.calendar_table tbody td {
+	color: #999999;
+	width: 100px;
+	height: 80px;
+	border: 1px solid #3D3D3D;
+	text-align: center;
+	vertical-align: top;
+	padding: 5px;
+}
+
+.calendar_table tbody td .day_of_month{
+	text-align: right;
+	font-weight: bold;
+}
+
+.calendar_table .currentDay {
+	color: red;
+}
+
+.event {
+	margin-top: 5px;
+	background-color: red;
+	border: 3px solid #820909;
+	padding: 2px;
+	font-weight: bold;
+	color: snow;
+	border-radius: 10px;
+	font-size: 0.85em;
+	width: 100px;
+	height: 50px;
+	box-shadow: 2px 2px 2px grey;
+}
+
+.calendarWeek
+{
+	width: 35px !important;
+	background-color: #999999;
+	color: white !important;
+	font-weight: bold;
+}
