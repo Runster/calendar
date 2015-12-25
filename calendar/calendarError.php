@@ -31,7 +31,6 @@ class CalendarError
 
 	/**
 	 * Writes the error in the error array and logs the error, if it's specified
-	 * F
 	 * in the settings
 	 *
 	 * @param string $title        	
