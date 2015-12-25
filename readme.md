@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Runster/calendar.svg?branch=master)](https://travis-ci.org/Runster/calendar)
+
 #About
 This calendar leaves you lots of possibilities:
 You can choose between different settings:
